@@ -1,20 +1,19 @@
 package fr.techad.sonar.gerrit;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import fr.techad.sonar.GerritPluginException;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-import fr.techad.sonar.GerritPluginException;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class GerritRestFacade extends GerritFacade {
 	private static final Logger LOG = LoggerFactory.getLogger(GerritRestFacade.class);
@@ -66,5 +65,17 @@ public class GerritRestFacade extends GerritFacade {
 	@NotNull
 	protected String trimResponse(@NotNull String response) {
 		return StringUtils.replaceOnce(response, JSON_RESPONSE_PREFIX, "");
+	}
+
+	@Override
+	public void setCoverage(@Nullable PatchCoverageInput patchCoverageInput) throws GerritPluginException {
+		if (patchCoverageInput == null) {
+			return;
+		}
+		try {
+			gerritConnector.setCoverage(formatCoverage(patchCoverageInput));
+		} catch (IOException e) {
+			throw new GerritPluginException(ERROR_SETTING, e);
+		}
 	}
 }
