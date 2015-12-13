@@ -1,5 +1,7 @@
 package fr.techad.sonar;
 
+import fr.techad.sonar.coverage.GerritCoverageSensor;
+import fr.techad.sonar.coverage.PatchCoverageInput;
 import fr.techad.sonar.gerrit.GerritConnectorFactory;
 import fr.techad.sonar.gerrit.GerritFacadeFactory;
 import org.sonar.api.PropertyType;
@@ -101,7 +103,7 @@ public final class GerritPlugin implements Plugin {
                 .index(reviewBaseIndex++).build();
 
         context.addExtensions(Arrays.asList(GerritConfiguration.class, GerritConnectorFactory.class,
-                GerritFacadeFactory.class, GerritInitializer.class, GerritProjectBuilder.class, GerritPostJob.class,
+                GerritFacadeFactory.class, GerritInitializer.class, GerritProjectBuilder.class, GerritPostJob.class, GerritCoverageSensor.class, PatchCoverageInput.class,
                 enabled, scheme, host, port, username, password, authScheme, basePath, sshKeyPath, label, message,
                 newIssuesOnly, threshold, voteNoIssue, voteIssueBelowThreshold, voteIssueAboveThreshold, issueComment));
     }

@@ -1,21 +1,19 @@
 package fr.techad.sonar.gerrit;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.jetbrains.annotations.NotNull;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import fr.techad.sonar.GerritPluginException;
+import fr.techad.sonar.coverage.PatchCoverageInput;
+import org.jetbrains.annotations.NotNull;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GerritSshFacade extends GerritFacade {
     private static final Logger LOG = Loggers.get(GerritSshFacade.class);
@@ -80,4 +78,7 @@ public class GerritSshFacade extends GerritFacade {
         return "DELETED".equals(jsonObject.get("type").getAsString());
     }
 
+	@Override public void setCoverage(PatchCoverageInput patchCoverageInput) throws GerritPluginException {
+        throw new UnsupportedOperationException();
+    }
 }

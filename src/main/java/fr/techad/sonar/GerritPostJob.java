@@ -1,5 +1,6 @@
 package fr.techad.sonar;
 
+import fr.techad.sonar.coverage.PatchCoverageInput;
 import fr.techad.sonar.gerrit.GerritFacade;
 import fr.techad.sonar.gerrit.GerritFacadeFactory;
 import fr.techad.sonar.gerrit.ReviewFileComment;
@@ -33,16 +34,18 @@ public class GerritPostJob implements PostJob {
     private static final Logger LOG = Loggers.get(GerritPostJob.class);
     private final Settings settings;
     private final GerritConfiguration gerritConfiguration;
+	private final PatchCoverageInput patchCoverageInput;
     private Map<String, String> gerritModifiedFiles;
     private GerritFacade gerritFacade;
     private ReviewInput reviewInput = ReviewHolder.getReviewInput();
 
     public GerritPostJob(Settings settings, GerritConfiguration gerritConfiguration,
-            GerritFacadeFactory gerritFacadeFactory) {
+			GerritFacadeFactory gerritFacadeFactory, PatchCoverageInput patchCoverageInput) {
         LOG.debug("[GERRIT PLUGIN] Instanciating GerritPostJob");
         this.settings = settings;
         this.gerritFacade = gerritFacadeFactory.getFacade();
         this.gerritConfiguration = gerritConfiguration;
+		this.patchCoverageInput = patchCoverageInput;
     }
 
     @Override
@@ -119,6 +122,7 @@ public class GerritPostJob implements PostJob {
             }
 
             gerritFacade.setReview(reviewInput);
+			gerritFacade.setCoverage(patchCoverageInput);
 
         } catch (GerritPluginException e) {
             LOG.error("[GERRIT PLUGIN] Error sending review to Gerrit", e);

@@ -6,11 +6,15 @@ import static org.hamcrest.CoreMatchers.*;
 import java.util.Map;
 
 import org.junit.Test;
+import fr.techad.sonar.GerritPluginException;
+import fr.techad.sonar.coverage.PatchCoverageInput;
 
 public class GerritFacadeTest {
 	
 	private GerritFacade facade = new GerritFacade() {
-	    public Map<String, String> listFiles() { return null;};
+	    public Map<String, String> listFiles() { return null;}
+
+		@Override public void setCoverage(PatchCoverageInput patchCoverageInput) throws GerritPluginException {};
 		public void setReview(ReviewInput reviewInput) {};
 	};
 

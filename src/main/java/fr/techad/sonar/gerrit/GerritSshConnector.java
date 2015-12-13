@@ -1,18 +1,16 @@
 package fr.techad.sonar.gerrit;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import fi.jpalomaki.ssh.Result;
 import fi.jpalomaki.ssh.SshClient;
 import fi.jpalomaki.ssh.UserAtHost;
 import fi.jpalomaki.ssh.jsch.JschSshClient;
-
+import fr.techad.sonar.GerritConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
-import fr.techad.sonar.GerritConfiguration;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class GerritSshConnector implements GerritConnector {
     private static final Logger LOG = Loggers.get(GerritSshConnector.class);
@@ -57,5 +55,9 @@ public class GerritSshConnector implements GerritConnector {
                 stdin, userAtHost);
 
         return cmdResult.stdoutAsText();
+	}
+
+	@Override public String setCoverage(String coverageInputAsJson) throws IOException {
+		throw new UnsupportedOperationException();
     }
 }
