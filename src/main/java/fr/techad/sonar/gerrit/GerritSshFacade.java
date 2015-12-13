@@ -1,23 +1,22 @@
 package fr.techad.sonar.gerrit;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import fr.techad.sonar.GerritPluginException;
+import fr.techad.sonar.coverage.PatchCoverageInput;
+import org.jetbrains.annotations.NotNull;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jetbrains.annotations.NotNull;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-import fr.techad.sonar.GerritPluginException;
-
 public class GerritSshFacade extends GerritFacade {
-	private static final Logger LOG = Loggers.get(GerritSshFacade.class);
-	private static final String COMMIT_MSG = "/COMMIT_MSG";
+	private static final Logger LOG           = Loggers.get(GerritSshFacade.class);
+	private static final String COMMIT_MSG    = "/COMMIT_MSG";
 	private static final String ERROR_LISTING = "Error listing files";
 	private static final String ERROR_SETTING = "Error setting review";
 
@@ -60,5 +59,9 @@ public class GerritSshFacade extends GerritFacade {
 		} catch (IOException e) {
 			throw new GerritPluginException(ERROR_SETTING, e);
 		}
+	}
+
+	@Override public void setCoverage(PatchCoverageInput patchCoverageInput) throws GerritPluginException {
+		throw new UnsupportedOperationException();
 	}
 }

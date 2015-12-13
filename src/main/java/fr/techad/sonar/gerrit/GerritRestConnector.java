@@ -1,9 +1,7 @@
 package fr.techad.sonar.gerrit;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
+import fr.techad.sonar.GerritConfiguration;
+import fr.techad.sonar.GerritConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScheme;
@@ -28,8 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
-import fr.techad.sonar.GerritConfiguration;
-import fr.techad.sonar.GerritConstants;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class GerritRestConnector implements GerritConnector {
 	private static final Logger LOG = Loggers.get(GerritRestConnector.class);
@@ -38,6 +37,7 @@ public class GerritRestConnector implements GerritConnector {
 	private static final String URI_REVISIONS = "/revisions/%s";
 	private static final String URI_LIST_FILES_SUFFIX = "/files/";
 	private static final String URI_SET_REVIEW = "/review";
+	private static final String URI_SET_COVERAGE = "/coverage";
 	private static int REQUEST_COUNTER;
 	private HttpHost httpHost;
 	private CloseableHttpClient httpClient;
@@ -75,6 +75,23 @@ public class GerritRestConnector implements GerritConnector {
 
 		HttpPost httpPost = new HttpPost(postUri);
 		httpPost.setEntity(new StringEntity(reviewInputAsJson, ContentType.APPLICATION_JSON));
+
+		CloseableHttpResponse httpResponse = logAndExecute(httpPost);
+		return consumeAndLogEntity(httpResponse);
+	}
+
+	@NotNull
+	@Override
+	public String setCoverage(String coverageInputAsJson) throws IOException {
+		LOG.info("[GERRIT PLUGIN] Setting coverage {}", coverageInputAsJson);
+
+		String postUri = rootUriBuilder();
+		postUri = postUri.concat(URI_SET_COVERAGE);
+
+		LOG.info("[GERRIT PLUGIN] Setting coverage at {}", postUri);
+
+		HttpPost httpPost = new HttpPost(postUri);
+		httpPost.setEntity(new StringEntity(coverageInputAsJson, ContentType.APPLICATION_JSON));
 
 		CloseableHttpResponse httpResponse = logAndExecute(httpPost);
 		return consumeAndLogEntity(httpResponse);

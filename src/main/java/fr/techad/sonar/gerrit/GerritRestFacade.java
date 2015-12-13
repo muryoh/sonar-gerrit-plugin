@@ -1,27 +1,26 @@
 package fr.techad.sonar.gerrit;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import fr.techad.sonar.GerritPluginException;
+import fr.techad.sonar.coverage.PatchCoverageInput;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.sonar.api.utils.log.Loggers;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-import fr.techad.sonar.GerritPluginException;
-
 public class GerritRestFacade extends GerritFacade {
-	private static final Logger LOG = Loggers.get(GerritRestFacade.class);
-	private static final String JSON_RESPONSE_PREFIX = ")]}'";
-	private static final String COMMIT_MSG = "/COMMIT_MSG";
-	private static final String ERROR_LISTING = "Error listing files";
-	private static final String ERROR_SETTING = "Error setting review";
+	private static final org.sonar.api.utils.log.Logger LOG                  = Loggers.get(GerritRestFacade.class);
+	private static final String                         JSON_RESPONSE_PREFIX = ")]}'";
+	private static final String                         COMMIT_MSG           = "/COMMIT_MSG";
+	private static final String                         ERROR_LISTING        = "Error listing files";
+	private static final String                         ERROR_SETTING        = "Error setting review";
 	private final GerritConnector gerritConnector;
 	private Map<String, String> gerritFileList = new HashMap<String, String>();
 
@@ -66,5 +65,17 @@ public class GerritRestFacade extends GerritFacade {
 	@NotNull
 	protected String trimResponse(@NotNull String response) {
 		return StringUtils.replaceOnce(response, JSON_RESPONSE_PREFIX, "");
+	}
+
+	@Override
+	public void setCoverage(@Nullable PatchCoverageInput patchCoverageInput) throws GerritPluginException {
+		if (patchCoverageInput == null) {
+			return;
+		}
+		try {
+			gerritConnector.setCoverage(formatCoverage(patchCoverageInput));
+		} catch (IOException e) {
+			throw new GerritPluginException(ERROR_SETTING, e);
+		}
 	}
 }

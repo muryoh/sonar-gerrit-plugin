@@ -1,14 +1,13 @@
 package fr.techad.sonar.gerrit;
 
+import com.google.gson.stream.JsonWriter;
+import fr.techad.sonar.GerritPluginException;
+import fr.techad.sonar.coverage.PatchCoverageInput;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
-
-import org.jetbrains.annotations.NotNull;
-
-import com.google.gson.stream.JsonWriter;
-
-import fr.techad.sonar.GerritPluginException;
 
 public abstract class GerritFacade {
 	private static final String MAVEN_ENTRY_REGEX = ".*src/";
@@ -62,7 +61,45 @@ public abstract class GerritFacade {
 		return stringWriter.toString();
 	}
 
+	String formatCoverage(PatchCoverageInput patchCoverageInput) throws GerritPluginException {
+		StringWriter stringWriter = new StringWriter();
+		JsonWriter jsonWriter = new JsonWriter(stringWriter);
+
+		try {
+			jsonWriter.beginObject();
+			if (!patchCoverageInput.getCoverage().isEmpty()) {
+				jsonWriter.name("coverage").beginObject();
+				for (Map.Entry<String, FileCoverageInput> fileCoverage : patchCoverageInput.getCoverage().entrySet()) {
+					jsonWriter.name(fileCoverage.getKey()).beginObject();
+					FileCoverageInput fileCoverageInput = fileCoverage.getValue();
+					writeMap(jsonWriter, "hits", fileCoverageInput.getHits());
+					writeMap(jsonWriter, "conditions", fileCoverageInput.getConditions());
+					writeMap(jsonWriter, "covered_conditions", fileCoverageInput.getCoveredConditions());
+					jsonWriter.endObject();
+				}
+				jsonWriter.endObject();
+			}
+			jsonWriter.endObject();
+			jsonWriter.close();
+		} catch (IOException e) {
+			throw new GerritPluginException(ERROR_FORMAT, e);
+		}
+
+		return stringWriter.toString();
+	}
+
+	private void writeMap(JsonWriter jsonWriter, String name, Map<Integer, Integer> map) throws IOException {
+		jsonWriter.name(name).beginObject();
+		for (Map.Entry<Integer, Integer> entry : map.entrySet())
+        {
+            jsonWriter.name(entry.getKey().toString()).value(entry.getValue());
+        }
+		jsonWriter.endObject();
+	}
+
 	protected String parseFileName(@NotNull String fileName) {
 		return fileName.replaceFirst(MAVEN_ENTRY_REGEX, "src/");
 	}
+
+	public abstract void setCoverage(PatchCoverageInput patchCoverageInput) throws GerritPluginException;
 }
